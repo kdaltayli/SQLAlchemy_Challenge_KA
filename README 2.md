@@ -1,4 +1,4 @@
-# SQLAlchemy_Challenge_KA
+# SQLAlchemy Homework - Surfs Up!
 
 ### Before You Begin
 
