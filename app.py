@@ -32,8 +32,8 @@ def welcome():
         f"/api/v1.0/precipitation<br/>"
         f"/api/v1.0/stations<br/>"
         f"/api/v1.0/tobs<br/>"
-        f"/api/v1.0/<start><br/>"
-        f"/api/v1.0/<start>/<end>"
+        f"/api/v1.0/start<br/>"
+        f"/api/v1.0/start/end"
     )
 
 @app.route("/api/v1.0/precipitation")
@@ -82,9 +82,9 @@ def tobs():
 @app.route("/api/v1.0/<start>")
 def climate_start(start):
     session=Session(engine)
-    start_dt = dt.datetime.strptime(start, '%Y-%m-%d')
+    # start_dt = dt.datetime.strptime(start, '%Y-%m-%d')
 
-    result= session.query(Measurement.date, func.min(Measurement.tobs),func.max(Measurement.tobs),func.round(func.avg(Measurement.tobs),2)).filter(Measurement.station >= start_dt).all()
+    result= session.query(Measurement.date, func.min(Measurement.tobs),func.max(Measurement.tobs),func.round(func.avg(Measurement.tobs),2)).filter(Measurement.date >= start).all()
     session.close()
 
     
@@ -93,7 +93,7 @@ def climate_start(start):
 
     for date, min,max,avg in result:
         result_dic={}
-        result_dic['Start Date']=start_dt
+        result_dic['Start Date']=start
         result_dic['TMIN']=min
         result_dic['TMAX']=max
         result_dic['TAVG']=avg
@@ -111,19 +111,19 @@ def start_end_date(start,end):
     # for a given start or start-end range.
  
    
-    start_dt = dt.datetime.strptime(start, '%Y-%m-%d')
-    end_dt = dt.datetime.strptime(end, "%Y-%m-%d")
+    # start_dt = dt.datetime.strptime(start, '%Y-%m-%d')
+    # end_dt = dt.datetime.strptime(end, "%Y-%m-%d")
 
-    result= session.query(Measurement.date, func.min(Measurement.tobs),func.max(Measurement.tobs),func.round(func.avg(Measurement.tobs),2)).\
-        filter(Measurement.date>=start_dt).filter(Measurement.date<=end_dt).all()
+    result= session.query(func.min(Measurement.tobs),func.max(Measurement.tobs),func.round(func.avg(Measurement.tobs),2)).\
+        filter(Measurement.date>=start).filter(Measurement.date<=end).all()
     session.close()
 
     json_list=[]
 
-    for date,min,max,avg,date in result:
+    for min,max,avg in result:
         json_dict={}
-        json_dict['Start Date']=start_dt
-        json_dict['End Date']=end_dt
+        json_dict['Start Date']=start
+        json_dict['End Date']=end
         json_dict['TMIN']=min
         json_dict['TMAX']=max
         json_dict['TAVG']=avg
